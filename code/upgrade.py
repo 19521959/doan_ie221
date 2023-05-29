@@ -7,13 +7,13 @@ class Upgrade:
 
         #general setup
         '''
-        Đây là class dùng để thiết lập cơ chế nâng cấp cho trò chơi
-        Attribute 
+        Đây là class dùng để thiết lập cơ chế nâng cấp cho trò chơi khi đủ lượng Exp yêu cầu
+        Attribute: 
           self.display_surface : Surface màn hình
           self.player : người chơi
           self.attribute_nr : là độ lớn các thuộc tính của người chơi
           self.attribute_names : là tên các thuộc tính 
-          self.font : là font các thuộc tính
+          self.font : font các thuộc tính
           self.max_value : là chỉ số thuộc tính tối đa
           self.current_values : là chỉ số thuộc tính hiện tại mà người chơi đang có 
         '''
@@ -38,7 +38,7 @@ class Upgrade:
         #selection system
         '''
           self.selection_time : là thời gian chọn nâng cấp
-          self.can_move : di chuyển 
+          self.can_move : di chuyển khi lựa chọn nâng cấp các thuộc tính nhân vật
           self.move_fx : bỏ âm thanh vào menu
           self.move_fx.set_volume(0.3) : set độ lớn âm thanh của menu
         '''
@@ -52,8 +52,8 @@ class Upgrade:
 
         '''
           input : keys[pygame.K_RIGHT],keys[pygame.K_LEFT],keys[pygame.K_UP]
-          output : phím trái, phải để chọn các thanh nâng cấp stat của nhân vật
-                 phím trên để nâng cấp stat nếu đủ điểm
+          output : phím Left, Right để chọn các thanh nâng cấp thuộc tính của nhân vật
+                 phím Up để nâng cấp stat nếu đủ điểm
         '''
         keys = pygame.key.get_pressed()
 
@@ -78,7 +78,7 @@ class Upgrade:
     def create_items(self):
 
         '''
-        Hàm này dùng để tạo item
+        Hàm này dùng để tạo các item chứa thuộc tính
         Attribute 
           self.item_list : là danh sách các item
           #horizontal position và #vertical position : tạo tương tác giữa item và player
@@ -113,9 +113,9 @@ class Upgrade:
 
     def display(self):
         '''
-        Chạy cả hai hàm input() và selection_cooldown
+        Hiện thông tin các item thông qua hai hàm input() và selection_cooldown
           input : index, item 
-          output : name, value, max_value, current_value, cost 
+          output : name, value, max_value, current_value, cost từng thuộc tính có thể nâng cấp
         '''
         self.input()
         self.selection_cooldown()
@@ -133,12 +133,12 @@ class Item:
     def __init__(self, l, t, w, h, index, font):
         '''
         Attribute
-          self.rect : tạo rect cho l,t,w,h
-          self.index : tạo index
-          self.font : tạo font 
-          self.up : âm thanh item
+          self.rect : tạo rect item theo left, top, width, height
+          self.index : tạo index từng item
+          self.font : tạo font chữ
+          self.up : âm thanh của item
           self.up.set_volume : điều chỉnh độ lớn âm thanh
-          self.c_up : âm thanh menu
+          self.c_up : âm thanh menu màn hình Upgrade
           self.c_up.set_volume : điều chỉnh độ lớn âm thanh
         '''
         self.rect = pygame.Rect(l, t, w, h)
@@ -163,7 +163,7 @@ class Item:
         title_rect = title_surf.get_rect(midtop = self.rect.midtop + pygame.math.Vector2(0,20))
         #cost
         '''
-          cost_surf : viết cost lên surface
+          cost_surf : tạo cost lên surface
           cost_rect : tạo rect cho cost_surf
         '''
         cost_surf = self.font.render(f'{int(cost)}', False, color)
@@ -181,12 +181,12 @@ class Item:
     def display_bar(self, surface, value, max_value, selected, current_values):
         #drawing setup
         '''
-        Hàm này dùng để vẽ thanh bar lên màn hình
+        Hàm này dùng để vẽ thanh bar lên màn hình Upgrade. Thanh bar sẽ thay đổi màu và màu chữ trong lúc đang chọn 
         Attribute 
-          top với bottom : xác định vị trí với pygame.math.Vector2
-          color : - input : selected
+          top với bottom : xác định vị trí bằng pygame.math.Vector2
+          color : - input : selected(thuộc tính đang chọn)
                   - output : BAR_COLOR_SELECTED hoặc BAR_COLOR
-          text_color : - input : selected
+          text_color : - input : selected(thuộc tính đang chọn)
                        - output : TEXT_COLOR_SELECTED hoặc TEXT_COLOR
         '''
         top = self.rect.midtop + pygame.math.Vector2(0, 60)
@@ -196,7 +196,7 @@ class Item:
         #bar setup
         '''
           full_height : set up chiều cao của thanh bar
-          relative_number : các số liên qua tới bar
+          relative_number : các số liên quan tới bar
           value_rect : tạo rect cho value
         '''
         full_height = bottom[1] - top[1]
@@ -214,7 +214,7 @@ class Item:
 
         #draw elements 
         '''
-        Bắt đầu vẽ ra surface
+          Vẽ ra surface
           surface.blit(curr_surf, curr_rect) : vẽ current value lên màn hình
         '''
         pygame.draw.line(surface, color, top, bottom, 5)
@@ -223,10 +223,12 @@ class Item:
     
     def trigger(self, player): 
         '''
-        Hàm này dùng để tạo sự tương tác giữa player và thanh bar thuộc tính
+        Hàm này dùng để tạo sự tương tác giữa player và thanh bar thuộc tính theo giá trị exp của nhân vật
           input : player.exp, player.upgrade_cost, upgrade_attribute, player.max_stat
           output : player.stats[upgrade_attribute]
                    player.upgrade_cost[upgrade_attribute]
+          Nếu điểm thuộc tính đã nâng cấp vượt qua giá trị tối đa mà thuộc tính có thể có thì 
+          set điểm thuộc tính đó bằng giá trị tối đa của thuộc tính đó.
         '''
         upgrade_attribute = list(player.stats.keys())[self.index]
 

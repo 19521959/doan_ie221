@@ -7,7 +7,7 @@ class Weapon(pygame.sprite.Sprite):
       self.sprite_type(string) : loại sprite dùng trong class này là 'weapon'
       direction(string) : phương hướng của vũ khí khi tấn công
       full_path : đường dẫn tới file hình ảnh
-      self.image : load hình ảnh của full_path
+      self.image : load hình ảnh thông qua đường dẫn full_path
     '''
     def __init__(self, player, groups):
         super().__init__(groups)

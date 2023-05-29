@@ -4,9 +4,29 @@ from settings import *
 from support import *
 
 class Item(Entity):
-    
+    '''
+    Class này dùng để tạo các item và âm thanh khi nhặt item 
+    '''
     def __init__(self, item_name, pos, groups):
+        '''
+        Hàm khởi tạo cho class Item (Entity)
+        Attributes:
+            #general setup
+            - self.sprite_type : loại sprite (item)
+            - self.status : trạng thái
+            - self.item_name : tên item 
+            
+            #graphics setup
+            - self.import_graphics(item_name) : đưa hình ảnh vào
+            - self.image : trạng thái của hình ảnh
+            - self.image(pygame.transform.scale(self.image, (64, 64))) : chuyển hình ảnh thành kích cỡ 64x64
+            - self.rect : tạo rect cho hình ảnh đó
 
+            #movement
+            - self.hitbox : hitbox của item
+            - self.pick_up_sound : âm thanh khi nhặt item
+            - self.pick_up_sound.set_volume(0.4) : set up độ lớn âm thanh
+        '''  
         #general setup
        
         super().__init__(groups)
@@ -28,7 +48,15 @@ class Item(Entity):
         self.pick_up_sound.set_volume(0.4)
 
     def import_graphics(self, name):
-        
+        '''
+        Hàm dùng để đưa ảnh của item vào trong game
+        - self.animation : lấy trạng thái hình ảnh 'idle'
+        - main_path : đường dẫn tới ảnh của item đó
+        input : 
+        Animation trong self.animation.keys()
+        ouput : 
+        Đưa hình ảnh và hoạt ảnh của item đó vào trong game
+        '''
         self.animations = {
             'idle':[],
         }
