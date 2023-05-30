@@ -6,9 +6,88 @@ from Dashing import *
 
 
 class Player(Entity):
+    '''
+    Class dùng để tạo object Player. Thừa kế từ class cha Entity.
 
+    '''
     def __init__(self, pos, groups, obstacle_sprites, create_attack, destroy_attack, create_magic, visible_sprites, toggle_gachapon, timer):
+        '''
+        Hàm khởi tạo của class Player.
+        input:
+            - pos ((x,y)): vị trí người chơi
+            - groups (pygame.Group): các group object 
+            - self.obstacle_sprites (pygame.Group): group các obstacle_sprites
+            - self.create_attack: hàm truyền vào create_attack
+            - self.destroy_attack: hàm truyền vào destroy_attack
+            - self.create_magic: hàm truyễn vào create_magic
+            - self.visible_sprites (pygame.Group): group các visible_sprites
+            - self.toggle_gacha: hàm kích hoạt toggle_gacha
+            - timer (Timer): bộ đếm thời gian
 
+        Attributes:
+            - self.image (pygame.image): hình ảnh người chơi
+            - self.rect (pygame.Rect): Rect của người chơi dựa trên hình ảnh
+            - self.hitbox (pygame.hitbox): hitbox của người chơi dựa trên rect
+            - self.visible_sprites (pygame.Group): group các visible_sprites
+            - self.timer (Timer): object Timer
+
+            #graphics setup
+            - self.status (str): trạng thái người chơi
+            - self.display_surface (pygame.Surface): Surface màn hình game
+
+            #task
+            - self.sprite_type (str): loại sprite
+            - self.dead (bool): Trạng thái chết
+
+            #movement
+            - self.attacking (bool): Trạng thái tấn công
+            - self.attack_time (time): thời gian tấn công
+            - self.obstacle_sprites (pygame.Group): group các obstacle_sprites
+
+            #weapon
+            - self.create_attack: hàm truyền vào create_attack
+            - self.destroy_attack: hàm truyền vào destroy_attack
+            - self.weapon_index (int): index vũ khí
+            - self.weapon (list): list các vũ khí
+            - self.can_switch_weapon (bool): Đổi vũ khí
+            - self.weapon_switch_time (time): thời gian đổi vũ khí
+            - self.switch_duration_cooldown (int): cooldown đổi vũ khí
+
+            #magic
+            - self.create_magic: hàm truyền vào create_magic
+            - self.magic_index (int): index của magic
+            - self.magic (list): list các magic có thể dùng
+            - self.can_switch_magic (bool): Đổi loại magic
+            - self.magic_switch_time (time): thời gian đổi magic
+            - self.switch_duration_cooldown (int): cooldown đổi magic
+
+            #stats
+            - self.stats (dict): stat mặc định của người chơi
+            - self.max_stats (dict): stat tối đa của người chơi
+            - self.upgrade_cost (dict): cost của mỗi nâng cấp
+            - self.health (int): máu hiện tại của người chơi
+            - self.energy (int): energy hiện tại của người chơi
+            - self.exp (int): exp hiện tại của người chơi
+            - self.speed (int): speed hiện tại của người chơi
+            - self.recovery_rate (float): tốc độ phục hồi energy
+            - self.attack_cooldown (int): cooldown tấn công của người chơi
+
+            #invincibility timer
+            - self.vulnerable (bool): trạng thái vulnerable của người chơi
+            - self.hurt_time (time): thời gian nhận damage từ quái
+            - self.invulnerability_duration (int): thời gian không bị tấn công
+
+            #import sounds
+            - self.weapon_attack_sound (pygame.mixer.Sound): âm thanh khi tấn công bằng vũ khí
+            - self.g_o_ft (bool): kiểm tra game over chưa
+            - self.game_over (pygame.mixer.Sound): âm thanh khi game over
+            - self.is_player (bool): kiểm tra là player
+            - self.font (pygame.font.Font): font in màn hình chết
+            - self.restart_pressed (bool): kiểm tra ấn phím restart chưa
+
+            #gacha
+            - self.toggle_gacha: hàm kích hoạt toggle_gacha
+        '''
         super().__init__(groups)
         self.image = pygame.image.load(
             './graphics/images/player.png').convert_alpha()
@@ -21,11 +100,12 @@ class Player(Entity):
         self.import_player_assets()
         self.status = 'down'
         self.display_surface = pygame.display.get_surface()
+        
         # task
         self.sprite_type = 'player'
         self.dead = False
+        
         # movement
-
         self.attacking = False
         self.attack_time = None
         self.obstacle_sprites = obstacle_sprites
@@ -81,7 +161,11 @@ class Player(Entity):
         self.toggle_gachapon = toggle_gachapon
 
     def input(self):
-
+        '''
+        Hàm input: 
+            - Nhận vào các input đầu vào của player và thay đổi status của player.
+            - Đồng thời xử lý các input tấn công và input thay đổi vũ khí/magic.
+        '''
         if self.health > 0:
             keys = pygame.key.get_pressed()
 
@@ -143,7 +227,12 @@ class Player(Entity):
                 self.weapon = list(weapon_data.keys())[self.weapon_index]
 
     def import_player_assets(self):
-
+        '''
+        Hàm import các hình ảnh của player vào animations tương ứng với các status của player.
+        Attributes:
+            - character_path (str): đường dẫn đến thư mục asset của player
+            - self.animations (dict): dictionary chứa asset
+        '''
         character_path = './graphics/player/'
         self.animations = {
             'up': [], 'down': [], 'left': [], 'right': [], 'right_idle': [], 'left_idle': [], 'up_idle': [], 'down_idle': [],
@@ -155,12 +244,23 @@ class Player(Entity):
             self.animations[animation] = import_folder(full_path)
 
     def write_to_file(self, data):
-
+        '''
+        Hàm ghi nhận highscore vào file save.
+        input:
+            data (int): thời gian mà player còn sống
+        '''
         with open('./save/save.txt', 'a') as score_file:
             score_file.write(data + '\n')
 
     def cooldowns(self):
-
+        '''
+        Hàm quản lý các cooldown của người chơi. Bao gồm:
+                    - Thời gian tấn công, 
+                    - Thời gian thay đổi vũ khí/magic, 
+                    - Thời gian không nhận sát thương từ quái.
+        Attributes:
+            current_time (time): thời gian hiện tại
+        '''
         current_time = pygame.time.get_ticks()
 
         if self.attacking:
@@ -181,14 +281,22 @@ class Player(Entity):
                 self.vulnerable = True
 
     def energy_recovery(self):
-
+        '''
+        Hàm xử lý việc hồi năng lượng theo thời gian.
+        Đồng thời ngăn chặn hồi năng lượng vượt ngưỡng năng lượng tối đa 
+        '''
         if self.energy <= self.stats['energy']:
             self.energy += self.recovery_rate
         else:
             self.energy = self.stats['energy']
 
     def animate(self):
-
+        '''
+        Hàm vẽ animation cho người chơi dựa trên status tương ứng.
+        output:
+            - self.image = image status tương ứng
+            - Tạo hiệu ứng flicker dựa trên hàm wave_value của entity
+        '''
         animation = self.animations[self.status]
 
         # loop over the frame index
@@ -209,7 +317,11 @@ class Player(Entity):
             self.image.set_alpha(255)
 
     def get_status(self):
-
+        '''
+        Hàm lấy trạng thái status của người chơi dựa trên vị trí x,y hoặc trạng thái tấn công.
+        output:
+            Trả về status hiện tại
+        '''
         # idle status
         if self.direction.x == 0 and self.direction.y == 0:
             if not 'idle' in self.status and not 'attack' in self.status:
@@ -230,31 +342,56 @@ class Player(Entity):
                 self.status = self.status.replace('_attack', '')
 
     def get_full_weapon_damage(self):
-
+        '''
+        Hàm lấy damage của người chơi +  damage của vũ khí
+        return:
+            Damage của người chơi + damage của vũ khí
+        '''
         base_damage = self.stats['attack']
         weapon_damage = weapon_data[self.weapon]['damage']
         return base_damage + weapon_damage
 
     def get_full_magic_damage(self):
-
+        '''
+        Hàm lấy damage của người chơi +  damage của magic
+        return:
+            Damage của người chơi + damage của magic
+        '''
         base_damage = self.stats['magic']
         spell_damage = magic_data[self.magic]['strength']
         return base_damage + spell_damage
 
     def get_value_by_index(self, index):
-
+        '''
+        Hàm lấy giá trị stat của người chơi dựa theo index.
+        return:
+            Giá trị stat của người chơi dựa theo index.
+        '''
         return list(self.stats.values())[index]
 
     def get_cost_by_index(self, index):
-
+        '''
+        Hàm lấy giá trị cost của người chơi dựa theo index.
+        return:
+            Giá trị cost của người chơi dựa theo index.
+        '''
         return list(self.upgrade_cost.values())[index]
 
     def get_current_values_by_index(self, index):
-
+        '''
+        Hàm lấy giá trị stat hiện tại dựa theo index.
+        return:
+            Giá trị stat hiện tại dựa theo index.
+        '''
         return list(self.stats.values())[index]
 
     def item_pickup(self):
-
+        '''
+        Hàm xử lý nhặt vật phẩm cho người chơi. 
+        - Sort qua các visible_sprites, nếu visible_sprites có sprite_type và sprite_type == 'item'
+        thì cho người chơi nhặt vật phẩm để nhận các chỉ số cộng thêm.
+        - Sau khi nhặt xong thì kill object vật phẩm ấy.
+        '''
         for sprite in self.visible_sprites:
             if hasattr(sprite, 'sprite_type') and sprite.sprite_type == 'item':
                 if sprite.item_name == 'potion':
@@ -277,7 +414,13 @@ class Player(Entity):
                         sprite.kill()
 
     def check_death(self):
-
+        '''
+        Hàm kiểm tra trạng thái chết. 
+        - Nếu health < 0 sẽ tạm dừng và dùng hàm write_to_file để ghi lại thời gian player đã sống và
+        set dead = True.
+        - In ra màn hình yêu cầu restart và gọi hiệu ứng âm thanh game over
+        - Nếu input người chơi là phím ENTER thì restart_pressed = True
+        '''
         if self.health < 0:
             self.timer.pause()
             if self.dead == False:
@@ -298,7 +441,9 @@ class Player(Entity):
                         self.restart_pressed = True
 
     def update(self):
-
+        '''
+        Hàm chạy các method của class Player và update các method.
+        '''
         self.input()
         self.item_pickup()
         self.cooldowns()

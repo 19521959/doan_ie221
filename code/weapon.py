@@ -2,12 +2,16 @@ import pygame
 
 class Weapon(pygame.sprite.Sprite):
     '''
-    class này dùng để tạo ra các vũ khí và tạo các chuyển động khi dùng vũ khí đó để tấn công
+    Class này dùng để tạo ra các vũ khí và tạo các chuyển động khi dùng vũ khí đó để tấn công
     Attribute :
-      self.sprite_type(string) : loại sprite dùng trong class này là 'weapon'
-      direction(string) : phương hướng của vũ khí khi tấn công
-      full_path : đường dẫn tới file hình ảnh
-      self.image : load hình ảnh thông qua đường dẫn full_path
+      - self.sprite_type(string) : loại sprite dùng trong class này là 'weapon'
+      - direction(string) : phương hướng của vũ khí khi tấn công
+      - full_path : đường dẫn tới file hình ảnh
+      - self.image : load hình ảnh thông qua đường dẫn full_path
+    input : 
+        Các hướng direction
+    output : 
+        Tùy theo các hướng direction sẽ cho ra các kết quả tương ứng
     '''
     def __init__(self, player, groups):
         super().__init__(groups)
@@ -19,10 +23,7 @@ class Weapon(pygame.sprite.Sprite):
         self.image = pygame.image.load(full_path).convert_alpha()
         
         #placement
-        '''
-        input : các loại direction
-        output : tùy theo các loại direction sẽ cho ra các kết quả tương ứng
-        '''
+        
         if direction == 'right':
             self.rect = self.image.get_rect(midleft = player.rect.midright + pygame.math.Vector2(0,16))
         elif direction == 'left':

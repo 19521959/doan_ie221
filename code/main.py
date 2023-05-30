@@ -5,9 +5,32 @@ from itertools import cycle
 from Highscore import Highscore
 BLINK_EVENT = pygame.USEREVENT + 0
 class Game:
-    
+    '''
+    Class Game, dùng để tạo 1 phiên game mới.
+
+    '''
     def __init__(self):
-        
+        '''
+        Hàm khởi tạo init
+        Attributes:
+            #sounds
+                - self.main_sound (pygame.mixer.Sound): Nhạc nền
+                - self.accept (pygame.mixer.Sound): Nhạc khi chọn các thuộc tính của UI
+                - self.state (str): Trạng thái của game
+                - self.started (bool): Game bắt đầu hay chưa
+                - self.font (pygame.font.Font): font chữ
+                - self.screen_rect (pygame.Rect): Rect màn hình game
+                - self.restart_f (bool): Trạng thái state restart
+
+            #title
+                - title_surf (pygame.Surface): Surface cho title
+                - self.title_rect (pygame.Rect): Rect cho title
+                - off_text_surf (pygame.Surface): Surface tắt dùng để tạo hiệu ứng chớp tắt
+                - self.blink_surfaces : hàm cycle dùng để chuyển giữa 2 trạng thái chớp tắt cho title
+                - self.blink_surf =: hàm next để chọn suface tiếp theo
+                - self.instruct_image (pygame.image): Hình ảnh hướng dẫn chơi
+                - self.instruct_rect (pygame.Rect): Rect của instruct_image
+        '''
         pygame.init()
         self.screen = pygame.display.set_mode((WIDTH, HEIGTH))
         self.clock = pygame.time.Clock()
@@ -41,7 +64,18 @@ class Game:
         self.instruct_rect = self.instruct_image.get_rect(center = (self.screen_rect.center[0], self.screen_rect.center[1] + 180))
 
     def intro(self):
-        
+        '''
+        Hàm chạy state 'intro' cho game lúc bắt đầu (Menu khởi đầu)
+        input:
+            self
+        output:
+            chạy visible_sprites.custom_draw
+            Nếu ấn quit thì tắt game
+            Nếu ấn Enter thì chuyển state sang 'main_game' bắt đầu level.timer
+            Nếu BLINK_EVENT(hiệu ứng chớp tắt của title) thì chuyển Surface của title sang surface blink tiếp theo
+            Vẽ title và hướng dẫn chơi
+            chạy pygame.display.update() để cập nhật hình ảnh game
+        '''
         if not self.started:
             self.level.visible_sprites.custom_draw(self.level.player, self.level.render_offset, self.level.player_attacked)
                 
@@ -62,7 +96,9 @@ class Game:
             pygame.display.update()
     
     def state_manager(self):
-        
+        '''
+        Hàm quản lý trạng thái state của game, gồm 3 state: intro, main_gaim, restart.
+        '''
         if self.state == 'intro':
             self.intro()
         if self.state == 'main_game':
@@ -74,7 +110,15 @@ class Game:
             self.level.timer.started = True
     
     def main_game(self):
-        
+        '''
+        Hàm game chính dùng để tạo level và xử lý gameplay.
+        output:
+            Lấp màn hình game bằng WATER_COLOR (trong settings.py)
+            Chạy level.run()
+            Nếu người chơi đã chết trước đó thì kiểm tra restart_f, Nếu restart_f == True thì gán restart_f = False, phát âm thanh restart
+            Kiểm tra thao tác menu của người chơi. Nếu ấn tab chạy level.toggle_menu(). Nếu ấn R chạy level.toggle_ranking().
+            Kiểm tra nếu máu người chơi <0 và level.player.restart_pressed == True thì chuyển state sang 'restart'
+        '''
         self.screen.fill(WATER_COLOR)
         self.level.run()
         pygame.display.update()
@@ -95,7 +139,9 @@ class Game:
             self.state = 'restart'
 
     def run(self):
-        
+        '''
+        Hàm chạy vòng lặp để chạy state_manager
+        '''
         while True:
             self.state_manager()
             self.clock.tick(FPS)

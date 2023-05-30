@@ -1,3 +1,11 @@
+'''
+File chứa các cài đặt chung của game như:
+- Kích thước màn hình chơi game
+- Các hitbox offset
+- Thiết lập kích thước, màu sắc, font chữ của UI
+- Các loại màu sắc cho menu, background, border background, text,...
+- Các thông tin, thuộc tính của weapon, magic, quái thú
+'''
 # game setup
 WIDTH = 1280
 HEIGTH = 720
