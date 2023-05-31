@@ -229,7 +229,7 @@ class Level:
         self.animation_player.create_particles(
             particle_type, pos, [self.visible_sprites])
         chance = rand.random()
-        if chance > 0.2:
+        if chance < 0.4:
             Item('potion', pos, [self.visible_sprites])
         if chance < 0.2:
             choice([lambda: Item('scroll', pos, [self.visible_sprites]),
