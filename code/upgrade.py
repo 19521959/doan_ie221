@@ -4,7 +4,7 @@ from settings import *
 
 class Upgrade:
     '''
-    Class dùng để thiết lập cơ chế nâng cấp cho trò chơi khi đủ lượng Exp yêu cầu
+    Class dùng để thiết lập cơ chế nâng cấp nhân vật khi đủ lượng Exp yêu cầu
 
     '''
     def __init__(self, player):

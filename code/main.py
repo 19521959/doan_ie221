@@ -97,7 +97,7 @@ class Game:
     
     def state_manager(self):
         '''
-        Hàm quản lý trạng thái state của game, gồm 3 state: intro, main_gaim, restart.
+        Hàm quản lý trạng thái state của game, gồm 3 state: intro, main_game, restart.
         '''
         if self.state == 'intro':
             self.intro()
@@ -150,3 +150,5 @@ class Game:
 if __name__ == '__main__':
     game = Game()
     game.run()
+    
+print(__doc__)

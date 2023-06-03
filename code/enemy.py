@@ -265,3 +265,4 @@ class Enemy(Entity):
         '''
         self.get_status(player)
         self.actions(player)
+    print(__doc__)
